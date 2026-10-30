@@ -33,11 +33,16 @@ def main() -> None:
         offset = start + size + (size & 1)
     if members.get("debian-binary", b"").strip() != b"2.0":
         raise SystemExit("bad debian-binary marker")
-    if "control.tar.gz" not in members or "data.tar.gz" not in members:
+    control_member = next((name for name in members if name.startswith("control.tar")), None)
+    data_member = next((name for name in members if name.startswith("data.tar")), None)
+    if not control_member or not data_member:
         raise SystemExit("missing control/data archive")
-    with tarfile.open(fileobj=io.BytesIO(members["control.tar.gz"]), mode="r:gz") as tf:
-        control = tf.extractfile("./control").read().decode("utf-8", "replace")
-    with tarfile.open(fileobj=io.BytesIO(members["data.tar.gz"]), mode="r:gz") as tf:
+    with tarfile.open(fileobj=io.BytesIO(members[control_member]), mode="r:*") as tf:
+        control_file = next((m for m in tf.getmembers() if m.isfile() and m.name.lstrip("./") == "control"), None)
+        if not control_file:
+            raise SystemExit("control file is missing from control archive")
+        control = tf.extractfile(control_file).read().decode("utf-8", "replace")
+    with tarfile.open(fileobj=io.BytesIO(members[data_member]), mode="r:*") as tf:
         files = [m.name.lstrip("./") for m in tf.getmembers() if m.isfile()]
         framework = next((m for m in tf.getmembers() if m.name.endswith("/Info.plist") and m.isfile()), None)
     if EXPECTED_CONTROL not in control:
