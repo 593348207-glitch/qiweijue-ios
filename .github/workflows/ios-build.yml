@@ -1,0 +1,34 @@
+name: iOS UI-only framework
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run UI state-machine tests
+        run: python3 tests/ui_only_harness.py --out build/ui_only_harness.json
+      - name: Build iOS device arm64 static framework
+        run: SDK=iphoneos ARCHS=arm64 scripts/build_framework.sh
+      - name: Build iOS simulator arm64 static framework
+        run: SDK=iphonesimulator ARCHS=arm64 scripts/build_framework.sh
+      - name: Upload framework artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: HCSafeOverlay-${{ github.sha }}
+          path: |
+            build/iphoneos/libHCSafeOverlay.a
+            build/iphonesimulator/libHCSafeOverlay.a
+            build/ui_only_harness.json
+          if-no-files-found: error
