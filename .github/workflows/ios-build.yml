@@ -32,6 +32,10 @@ jobs:
           mkdir -p build/logs
           set -o pipefail
           SDK=iphonesimulator ARCHS=arm64 bash scripts/build_framework.sh 2>&1 | tee build/logs/iphonesimulator.log
+      - name: Package and verify XCFramework
+        if: ${{ success() }}
+        shell: bash
+        run: bash scripts/package_xcframework.sh
       - name: Upload framework artifacts
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
@@ -40,6 +44,8 @@ jobs:
           path: |
             build/iphoneos/libHCSafeOverlay.a
             build/iphonesimulator/libHCSafeOverlay.a
+            build/HCSafeOverlay.xcframework/**
+            build/HCSafeOverlay.xcframework.manifest.json
             build/ui_only_harness.json
             build/logs/*.log
           if-no-files-found: warn

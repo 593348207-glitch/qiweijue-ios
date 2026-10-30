@@ -11,7 +11,13 @@ SDK=iphoneos ARCHS=arm64 scripts/build_framework.sh
 SDK=iphonesimulator ARCHS=arm64 scripts/build_framework.sh
 ```
 
-Outputs are written to `build/<sdk>/libHCSafeOverlay.a`. The source has a minimum iOS deployment target of 15.0.
+Outputs are written to `build/<sdk>/libHCSafeOverlay.a`. After both slices are built, package and verify them with:
+
+```sh
+bash scripts/package_xcframework.sh
+```
+
+This creates `build/HCSafeOverlay.xcframework` and `build/HCSafeOverlay.xcframework.manifest.json`. The verifier checks device and simulator platform declarations, arm64 architecture, public header, and per-slice SHA-256 values. The source has a minimum iOS deployment target of 15.0.
 
 ## Tests
 
@@ -19,7 +25,7 @@ Outputs are written to `build/<sdk>/libHCSafeOverlay.a`. The source has a minimu
 python3 tests/ui_only_harness.py --out build/ui_only_harness.json
 ```
 
-GitHub Actions runs the state-machine tests and builds device/simulator arm64 static libraries on a macOS runner. The workflow uploads build artifacts; it does not sign or package a game tweak.
+GitHub Actions runs the state-machine tests, builds device/simulator arm64 static libraries, packages and verifies the XCFramework, and uploads the framework plus manifest. It does not sign or package a game tweak.
 
 ## Integration contract
 

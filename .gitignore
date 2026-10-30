@@ -1,4 +1,5 @@
 build/
+*.xcframework/
 DerivedData/
 *.xcuserstate
 __pycache__/
