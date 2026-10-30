@@ -1,0 +1,8 @@
+Package: com.codev.hercomeback.ui-sdk
+Name: HCSafeOverlay UI SDK
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Description: UI-only UIKit overlay XCFramework developer SDK for rootless iOS projects.
+Maintainer: 593348207 <593348207@qq.com>
+Author: 593348207
+Section: Development

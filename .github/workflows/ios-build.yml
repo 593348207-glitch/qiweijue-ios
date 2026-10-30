@@ -19,6 +19,8 @@ jobs:
           python-version: "3.12"
       - name: Run UI state-machine tests
         run: python3 tests/ui_only_harness.py --out build/ui_only_harness.json
+      - name: Ensure Debian packager is available
+        run: command -v dpkg-deb || brew install dpkg
       - name: Build iOS device arm64 static framework
         shell: bash
         run: |
@@ -36,6 +38,14 @@ jobs:
         if: ${{ success() }}
         shell: bash
         run: bash scripts/package_xcframework.sh
+      - name: Build and verify rootless developer SDK DEB
+        if: ${{ success() }}
+        shell: bash
+        run: |
+          mkdir -p build/logs
+          set -o pipefail
+          bash scripts/build_sdk_deb.sh 2>&1 | tee build/logs/sdk-deb.log
+          python3 scripts/verify_sdk_deb.py build/HCSafeOverlay-UI-SDK_1.0.0_iphoneos-arm64.deb --manifest build/sdk-deb-manifest.json
       - name: Upload framework artifacts
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
@@ -46,6 +56,8 @@ jobs:
             build/iphonesimulator/libHCSafeOverlay.a
             build/HCSafeOverlay.xcframework/**
             build/HCSafeOverlay.xcframework.manifest.json
+            build/HCSafeOverlay-UI-SDK_1.0.0_iphoneos-arm64.deb
+            build/sdk-deb-manifest.json
             build/ui_only_harness.json
             build/logs/*.log
           if-no-files-found: warn

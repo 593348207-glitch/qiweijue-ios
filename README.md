@@ -25,7 +25,9 @@ This creates `build/HCSafeOverlay.xcframework` and `build/HCSafeOverlay.xcframew
 python3 tests/ui_only_harness.py --out build/ui_only_harness.json
 ```
 
-GitHub Actions runs the state-machine tests, builds device/simulator arm64 static libraries, packages and verifies the XCFramework, and uploads the framework plus manifest. It does not sign or package a game tweak.
+GitHub Actions runs the state-machine tests, builds device/simulator arm64 static libraries, packages and verifies the XCFramework, then builds and verifies a rootless developer SDK DEB.
+
+The rootless developer SDK DEB installs only `HCSafeOverlay.xcframework` under `/var/jb/Library/Developer/Frameworks/`; it contains no MobileSubstrate filter, game launch hook, or process-injection entry point. This package is a build dependency for a host application and does not add an overlay to the game by itself. Artifact validation checks the Debian control identity and rejects injection/game payload paths.
 
 ## Integration contract
 
