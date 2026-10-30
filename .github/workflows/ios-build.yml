@@ -24,14 +24,14 @@ jobs:
         run: |
           mkdir -p build/logs
           set -o pipefail
-          SDK=iphoneos ARCHS=arm64 scripts/build_framework.sh 2>&1 | tee build/logs/iphoneos.log
+          SDK=iphoneos ARCHS=arm64 bash scripts/build_framework.sh 2>&1 | tee build/logs/iphoneos.log
       - name: Build iOS simulator arm64 static framework
         if: ${{ success() }}
         shell: bash
         run: |
           mkdir -p build/logs
           set -o pipefail
-          SDK=iphonesimulator ARCHS=arm64 scripts/build_framework.sh 2>&1 | tee build/logs/iphonesimulator.log
+          SDK=iphonesimulator ARCHS=arm64 bash scripts/build_framework.sh 2>&1 | tee build/logs/iphonesimulator.log
       - name: Upload framework artifacts
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
