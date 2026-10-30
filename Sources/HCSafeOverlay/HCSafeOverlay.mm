@@ -5,6 +5,7 @@
 
 @implementation HCPassthroughWindow
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    (void)event;
     UIView *hit = [super hitTest:point withEvent:event];
     return hit == self.rootViewController.view ? nil : hit;
 }
